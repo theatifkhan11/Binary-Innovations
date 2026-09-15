@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Approach — Binary Innovations</title>
+<meta name="description" content="How Binary Innovations builds systems-level software, secure kernel modules, and C/C++ middleware for multi-tenant GPU infrastructure." />
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- Shared icon defs — see index.html for the canonical, commented copy. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="gh-mark" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.57.1.78-.25.78-.55v-2.15c-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.78 1.2 1.78 1.2 1.03 1.78 2.71 1.26 3.37.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.6.23 2.77.11 3.06.74.8 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.26 5.68.42.36.78 1.08.78 2.17v3.22c0 .3.21.66.79.55A10.52 10.52 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============================== HEADER ============================== -->
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-icon.png" alt="Binary Innovations logo" class="brand-icon" width="240" height="241" />
+      Binary Innovations
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav class="nav-links">
+      <a href="approach.html" aria-current="page">Approach</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <a class="icon-link" href="https://github.com/binary-innovations" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24"><use href="#gh-mark"/></svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================== PAGE HEADER ============================== -->
+<section class="page-header">
+  <div class="container">
+    <span class="eyebrow">// approach</span>
+    <h1>Systems software, built from the hardware up.</h1>
+    <p class="lede">We work below the application layer — in schedulers, allocators, and the pathways data takes between tenants — because that is where multi-tenant GPU infrastructure is actually breaking.</p>
+  </div>
+</section>
+
+<!-- ============================== THE PROBLEM ============================== -->
+<section class="panel-section" id="problem">
+  <div class="container">
+    <div class="panel-grid">
+      <div class="panel-head">
+        <h2>The problem</h2>
+      </div>
+      <div class="prose">
+        <p>Modern operating system architectures and traditional Linux kernel subsystems were not originally designed for massive, parallel AI workloads. They were designed for a world of many small, mostly-independent processes competing fairly for a CPU — not a handful of tenants competing for a shared pool of GPUs, each expecting isolation and consistent throughput.</p>
+        <p>That mismatch shows up in three places. Excessive context-switching burns cycles moving between tenants that all want the accelerator at once. Memory allocators built for general-purpose workloads fragment and stall under the large, bursty allocations parallel AI jobs make. And inter-process communication paths designed for trust between cooperating processes become a liability when the processes on either end belong to different customers.</p>
+        <p>Individually, each of these costs compute. Together, on shared infrastructure, they also become a security surface — timing side channels, imperfect isolation, and data that lingers somewhere it shouldn't.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== WHAT WE BUILD ============================== -->
+<section class="panel-section alt" id="build">
+  <div class="container">
+    <div class="panel-grid">
+      <div class="panel-head">
+        <h2>What we build</h2>
+      </div>
+      <div class="prose">
+        <p>We build systems-level software, secure kernel modules, and optimized C/C++ middleware layers to streamline memory access, secure low-level data pathways, and optimize hardware resource utilization for enterprise AI workloads.</p>
+        <p>Concretely, that means working in the layers most teams don't touch: the code between the scheduler and the device driver, the allocator sitting under a training or inference framework, and the IPC boundary between tenant processes sharing the same physical GPU. It's infrastructure meant to be invisible when it's working — lower overhead and a harder isolation boundary, without asking application teams to change how they write AI workloads.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== DESIGN PRINCIPLES ============================== -->
+<section class="panel-section" id="principles">
+  <div class="container">
+    <div class="panel-grid">
+      <div class="panel-head">
+        <h2>Design principles</h2>
+        <p class="prose" style="margin-top:12px;">The rules we build against, in rough order of what we'll trade off first.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar">
+          <span class="index">01</span>
+          <div>
+            <h3>Minimize the critical path</h3>
+            <p>Every layer we add has to earn its place on the hot path. If a mechanism can't justify its overhead against the compute it protects or saves, it doesn't ship.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="index">02</span>
+          <div>
+            <h3>Isolate at the lowest layer available</h3>
+            <p>Tenant isolation enforced in the kernel or the middleware is harder to bypass than isolation enforced by convention in application code. We push boundaries down, not up.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="index">03</span>
+          <div>
+            <h3>Treat security as a systems property</h3>
+            <p>Cross-tenant leakage is usually a side effect of something else — a shared allocator, a reused buffer, a scheduling decision — not a missing check. We design the underlying mechanism to make the leak structurally hard, not just monitored.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="index">04</span>
+          <div>
+            <h3>Measure before we claim</h3>
+            <p>We don't publish a number we can't reproduce on real hardware under real contention. Until we can, we describe the mechanism, not a benchmark.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CTA ============================== -->
+<section class="cta-band">
+  <div class="container">
+    <h2>Want the technical detail?</h2>
+    <p>Happy to walk through the design with your platform or infra team.</p>
+    <a href="contact.html#form" class="btn btn-primary">Get in touch</a>
+  </div>
+</section>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="site-footer">
+  <div class="container">
+    <span class="footer-meta">© <span data-year></span> Binary Innovations</span>
+    <nav class="footer-links">
+      <a href="mailto:theatifkhan11@gmail.com">theatifkhan11@gmail.com</a>
+      <a href="https://github.com/binary-innovations" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
